@@ -30,7 +30,11 @@
     </style>
   </head>
   <body>
-    <input type="text" onkeyup="changeFilter(this)" />
+    <input
+      type="text"
+      onkeyup="changeFilter(this)"
+      placeholder="Search Here (Case Sensitive) Branch, Name, company , package"
+    />
     <button onclick="fnExcelReport()">Export</button>
     <hr />
     <table id="data">
@@ -80,7 +84,8 @@
             (name.indexOf(filter) !== -1 ||
               branch.indexOf(filter) !== -1 ||
               company.indexOf(filter) !== -1 ||
-              package.indexOf(filter) !== -1)
+              package.indexOf(filter) !== -1 ||
+              recruitment.indexOf(filter) !== -1)
           ) {
             html += `<tr>
                 <td> ${index} </td>
