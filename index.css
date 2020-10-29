@@ -116,3 +116,7 @@ th::first-letter {
   box-shadow: 0 0 10px 0 #3498db inset, 0 0 10px 4px #3498db;
   color: black;
 }
+
+.highlight {
+  background-color: yellow;
+}

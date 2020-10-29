@@ -60,6 +60,19 @@ async function fetchData() {
   });
 }
 
+function highlight(text, highlight) {
+  let index = text.toLowerCase().indexOf(highlight.toLowerCase());
+  if (index >= 0 && highlight.length)
+    return (
+      text.substring(0, index) +
+      "<span class='highlight'>" +
+      text.substring(index, index + highlight.length) +
+      "</span>" +
+      text.substring(index + highlight.length)
+    );
+  return text;
+}
+
 function renderTable() {
   const Data = Recruitment === PLACEMENT_RECRUITMENT ? Placements : Internships;
   const branchInfo = {};
@@ -77,11 +90,11 @@ function renderTable() {
     if (full_text.toLowerCase().indexOf(filter) !== -1 && package_number >= minPackage && package_number <= maxPackage) {
       html += `<tr>
                 <td> ${index} </td>
-                <td> ${student_name} </td>
-                <td> ${branch} </td>
-                <td> ${company_name} </td>
-                <td> ${recruitment_type} </td>
-                <td> ${package} </td>
+                <td> ${highlight(student_name, filter)} </td>
+                <td> ${highlight(branch, filter)} </td>
+                <td> ${highlight(company_name, filter)} </td>
+                <td> ${highlight(recruitment_type, filter)} </td>
+                <td> ${highlight(package, filter)} </td>
             </tr>`;
 
       if (!branchInfo[branch]) branchInfo[branch] = { total_students: 0, total_package: 0, max_package: 0 };
