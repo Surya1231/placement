@@ -9,15 +9,17 @@
     <div class="top-bar">Placements</div>
     <div class="main-box">
       <div class="input-bar">
-        <input id="search" type="text" onkeyup="changeFilter(this)" placeholder="Search Here" />
-        <button id="export" onclick="fnExcelReport()">Export</button>
+        <input id="search" name="Search" type="text" onkeyup="changeFilter(this)" placeholder="Search Here" />
+        <button class="btn third" onclick="fnExcelReport()">Export</button>
       </div>
       <hr />
       <div class="input-bar">
-        <select id="search" type="text" onchange="changeRecruitment(this)">
+        <select class="input" name="Recruitment" type="text" onchange="changeFilter(this)" style="width: 300px">
           <option>Placement</option>
           <option>Internship</option>
         </select>
+        <input class="input" name="min-package" type="number" onkeyup="changeFilter(this)" placeholder="From" />
+        <input class="input" name="max-package" type="number" onkeyup="changeFilter(this)" placeholder="To" />
       </div>
       <hr />
       <table id="data">

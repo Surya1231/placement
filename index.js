@@ -2,6 +2,8 @@ let Placements = [];
 let Internships = [];
 let Search = "";
 let Recruitment = "Placement";
+let minPackage = 0;
+let maxPackage = 10000000000000;
 
 const PLACEMENT_RECRUITMENT = "Placement";
 
@@ -60,19 +62,19 @@ async function fetchData() {
 
 function renderTable() {
   const Data = Recruitment === PLACEMENT_RECRUITMENT ? Placements : Internships;
-  console.log(Data, Recruitment, Placements, Internships);
   const branchInfo = {};
   const globalInfo = { total_students: 0, total_package: 0, max_package: 0 };
   const filter = Search.toLowerCase();
+
   let index = 1;
   let html = "<tr><th>Sr No</th><th>Name</th><th>Branch</th><th>Company</th><th>Type</th><th>Package</th></tr>";
 
   Data.forEach((item) => {
     const { student_name, branch, company_name, recruitment_type, batch, job_profile, package } = item;
-
+    const package_number = Number(package);
     const full_text = [student_name, branch, company_name, recruitment_type, batch, job_profile, package].join("%");
 
-    if (full_text.toLowerCase().indexOf(filter) !== -1) {
+    if (full_text.toLowerCase().indexOf(filter) !== -1 && package_number >= minPackage && package_number <= maxPackage) {
       html += `<tr>
                 <td> ${index} </td>
                 <td> ${student_name} </td>
@@ -85,12 +87,12 @@ function renderTable() {
       if (!branchInfo[branch]) branchInfo[branch] = { total_students: 0, total_package: 0, max_package: 0 };
 
       branchInfo[branch].total_students++;
-      branchInfo[branch].total_package += Number(package);
-      branchInfo[branch].max_package = Math.max(branchInfo[branch].max_package, Number(package));
+      branchInfo[branch].total_package += package_number;
+      branchInfo[branch].max_package = Math.max(branchInfo[branch].max_package, package_number);
 
       globalInfo.total_students++;
-      globalInfo.total_package += Number(package);
-      globalInfo.max_package = Math.max(globalInfo.max_package, Number(package));
+      globalInfo.total_package += package_number;
+      globalInfo.max_package = Math.max(globalInfo.max_package, package_number);
 
       index++;
     }
@@ -114,12 +116,24 @@ function renderTable() {
 }
 
 function changeFilter(element) {
-  Search = element.value;
-  renderTable();
-}
-
-function changeRecruitment(element) {
-  Recruitment = element.value;
+  switch (element.name) {
+    case "Search": {
+      Search = element.value;
+      break;
+    }
+    case "Recruitment": {
+      Recruitment = element.value;
+      break;
+    }
+    case "max-package": {
+      maxPackage = element.value;
+      break;
+    }
+    case "min-package": {
+      minPackage = element.value;
+      break;
+    }
+  }
   renderTable();
 }
 
