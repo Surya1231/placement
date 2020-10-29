@@ -2,193 +2,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      table {
-        font-family: Arial, Helvetica, sans-serif;
-        border-collapse: collapse;
-      }
-      td,
-      th {
-        padding: 5px 20px;
-        border: 1px solid black;
-        text-align: center;
-      }
-
-      input {
-        width: 100%;
-        max-width: 500px;
-        padding: 5px 20px;
-        border-radius: 20px;
-      }
-
-      button {
-        padding: 5px 20px;
-        margin-left: 10px;
-        cursor: pointer;
-      }
-    </style>
+    <link rel="stylesheet" href="index.css" />
+    <title>Placements</title>
   </head>
   <body>
-    <input
-      type="text"
-      onkeyup="changeFilter(this)"
-      placeholder="Search Here (Case Sensitive) Branch, Name, company , package"
-    />
-    <button onclick="fnExcelReport()">Export</button>
-    <hr />
-    <table id="data">
-      <tr>
-        <th colspan="6">
-          Please Wait we are fetching live data for you it may take upto 1
-          minutes
-        </th>
-      </tr>
-      <th>Sr No</th>
-      <th>Name</th>
-      <th>Branch</th>
-      <th>Company</th>
-      <th>Type</th>
-      <th>Package</th>
-    </table>
+    <div class="top-bar">Placements</div>
+    <div class="main-box">
+      <div class="input-bar">
+        <input id="search" type="text" onkeyup="changeFilter(this)" placeholder="Search Here" />
+        <button id="export" onclick="fnExcelReport()">Export</button>
+      </div>
+      <hr />
+      <div class="input-bar">
+        <select id="search" type="text" onchange="changeRecruitment(this)">
+          <option>Placement</option>
+          <option>Internship</option>
+        </select>
+      </div>
+      <hr />
+      <table id="data">
+        <tr>
+          <th colspan="6">Please Wait we are fetching live data for you it may take upto 1 minutes</th>
+        </tr>
+        <th>Sr No</th>
+        <th>Name</th>
+        <th>Branch</th>
+        <th>Company</th>
+        <th>Type</th>
+        <th>Package</th>
+      </table>
+    </div>
 
-    <script src="server.js"></script>
-    <script>
-      let placements = [];
-      async function getData() {
-        const res = await fetch(
-          "https://cors-anywhere.herokuapp.com/http://placements.mnit.ac.in/api/placements/getAll",
-          { method: "POST" }
-        );
-        const data = await res.json();
-        placements = data.placements;
-        renderData("");
-      }
-
-      function renderData(filter) {
-        let html =
-          "<tr><th>Sr No</th><th>Name</th><th>Branch</th><th>Company</th><th>Type</th><th>Package</th></tr>";
-        let index = 1;
-        let branchInfo = {};
-        let globalInfo = {
-          total_students: 0,
-          total_package: 0,
-          max_package: 0,
-        };
-        placements.sort(
-          (obj1, obj2) => (obj2.package || 0) - (obj1.package || 0)
-        );
-        placements.forEach((item) => {
-          const name = item.students[0].student_name;
-          const branch = item.students[0].department;
-          const company = item.company_name;
-          const recruitment = item.recruitment_type;
-          const package = item.package;
-
-          if (
-            item.recruitment === "Placement" &&
-            (name.indexOf(filter) !== -1 ||
-              branch.indexOf(filter) !== -1 ||
-              company.indexOf(filter) !== -1 ||
-              package.indexOf(filter) !== -1 ||
-              recruitment.indexOf(filter) !== -1)
-          ) {
-            html += `<tr>
-                <td> ${index} </td>
-                <td> ${name} </td>
-                <td> ${branch} </td>
-                <td> ${company} </td>
-                <td> ${recruitment} </td>
-                <td> ${package} </td>
-            </tr>`;
-
-            if (!branchInfo[branch])
-              branchInfo[branch] = {
-                total_students: 0,
-                total_package: 0,
-                max_package: 0,
-              };
-
-            branchInfo[branch].total_students++;
-            branchInfo[branch].total_package += Number(package);
-            branchInfo[branch].max_package = Math.max(
-              branchInfo[branch].max_package,
-              Number(package)
-            );
-            globalInfo.total_students++;
-            globalInfo.total_package += Number(package);
-            globalInfo.max_package = Math.max(
-              globalInfo.max_package,
-              Number(package)
-            );
-
-            index++;
-          }
-        });
-
-        html +=
-          "<tr><td colspan='6'> -- </td></tr><tr><th colspan='6'> Analytics </th> </tr><tr><td colspan='6'> -- </td></tr>";
-        html +=
-          '<tr><th colspan="3">  Branch </th><th>Total placed</th><th>Highest</th><th>Average</th></tr>';
-
-        Object.keys(branchInfo).forEach((key) => {
-          html += `<tr><th colspan="3">  ${key} </th><td> ${
-            branchInfo[key].total_students
-          }</td><td>${branchInfo[key].max_package}</td><td>${Number(
-            (
-              branchInfo[key].total_package / branchInfo[key].total_students
-            ).toFixed(2)
-          )}</td></tr>`;
-        });
-        html += "<tr><td colspan='6'> -- </td></tr>";
-        html += `<tr><th colspan="3"> Global </th><td> ${
-          globalInfo.total_students
-        }</td><td> ${globalInfo.max_package} </td><td>${Number(
-          (globalInfo.total_package / globalInfo.total_students).toFixed(2)
-        )}</td></tr>`;
-
-        document.getElementById("data").innerHTML = html;
-      }
-
-      function changeFilter(element) {
-        renderData(element.value);
-      }
-
-      function fnExcelReport() {
-        var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
-        var textRange;
-        var j = 0;
-        tab = document.getElementById("data"); // id of table
-
-        for (j = 0; j < tab.rows.length; j++) {
-          tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
-        }
-
-        tab_text = tab_text + "</table>";
-
-        var ua = window.navigator.userAgent;
-        var msie = ua.indexOf("MSIE ");
-
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-          // If Internet Explorer
-          txtArea1.document.open("txt/html", "replace");
-          txtArea1.document.write(tab_text);
-          txtArea1.document.close();
-          txtArea1.focus();
-          sa = txtArea1.document.execCommand(
-            "SaveAs",
-            true,
-            "Say Thanks to Surya.xls"
-          );
-        } //other browser not tested on IE 11
-        else
-          sa = window.open(
-            "data:application/vnd.ms-excel," + encodeURIComponent(tab_text)
-          );
-
-        return sa;
-      }
-      getData();
-    </script>
+    <script src="index.js"></script>
   </body>
 </html>
