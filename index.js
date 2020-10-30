@@ -139,11 +139,11 @@ function changeFilter(element) {
       break;
     }
     case "max-package": {
-      maxPackage = element.value;
+      maxPackage = element.value || 100000000000;
       break;
     }
     case "min-package": {
-      minPackage = element.value;
+      minPackage = element.value || 0;
       break;
     }
   }
